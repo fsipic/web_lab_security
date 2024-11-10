@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Demo</title>
+    <style>
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Security Vulnerability Demo  (SQL Injection & Broken Access Control)</h1>
+
+    <p>Current User: <%= loggedInUser %></p>
+
+    <div>
+        <p>Upute za demonstraciju SQL Injectiona: za ostvarivanje sql injectiona potrebno je u polje password napisati tautologiju, u tom slučaju će se korisnik uspješno
+             ulogirati iako nije spremljen u bazu kao korisnik.
+        </p>
+        <p>Primjer tautologije: <span class="highlight">' OR '1'='1</span></p>
+
+    </div>
+
+
+    <form action="/login" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <div>
+        <label>
+            <input type="checkbox" id="sql-injection" 
+                   <%= enableSqlInjection ? 'checked' : '' %>>
+            Enable SQL Injection (when enabled, there is an sql injection possibility if using tautology for password)
+        </label>
+
+    </div>
+
+    <hr>
+    <hr>
+
+    <div>
+        <p>
+            Upute za demonstraciju Broken Access Controla: ako nije stavljena kvačica na enable Broken Access Control, korisnik treba biti ulogiran kao administrator kako bi imao pristup stranici /admin.
+            Ako je stavljena kvačica na Broken Access Control, ranjivost je omogućena i bilo tko ima pristup /admin stranici.
+        </p>
+    </div>
+    
+
+    <div>
+        <label>
+            <input type="checkbox" id="broken-access-control" 
+                   <%= enableBrokenAccessControl ? 'checked' : '' %>>
+            Enable Broken Access Control (when enabled, there is Broken Access Control vulnerability for checking the /admin page)
+        </label>
+    </div>
+
+    <p>
+        <a href="/admin">Go to Admin Page</a>
+    </p>
+    
+
+    <script>
+        document.getElementById('sql-injection').addEventListener('change', function() {
+            fetch('/toggle-sql-injection', { method: 'POST' })
+                .then(response => console.log('SQL Injection toggled'));
+        });
+
+        document.getElementById('broken-access-control').addEventListener('change', function() {
+            fetch('/toggle-access-control', { method: 'POST' })
+                .then(response => console.log('Access Control toggled'));
+        });
+    </script>
+</body>
+</html>
